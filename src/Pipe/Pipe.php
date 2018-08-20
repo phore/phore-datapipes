@@ -54,9 +54,6 @@ class Pipe
         }
     }
 
-
-
-
     public function connect(Joint $joint)
     {
         $this->joint = $joint;

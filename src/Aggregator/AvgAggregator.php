@@ -12,25 +12,27 @@ namespace Phore\DataPipes\Aggregator;
 class AvgAggregator implements Aggregator
 {
 
-    private $values = [];
-
+    private $sum = 0;
+    private $numValues = 0;
 
     public function reset()
     {
-        $this->values = [];
+        $this->sum = 0;
+        $this->numValues = 0;
     }
 
     public function addValue($value)
     {
         if ( ! is_numeric($value))
             return;
-        $this->values[] = $value;
+        $this->sum += $value;
+        $this->numValues++;
     }
 
     public function getAggregated()
     {
-        if (count($this->values) === 0)
+        if ($this->numValues === 0)
             return null;
-        return array_sum($this->values) / count($this->values);
+        return $this->sum / $this->numValues;
     }
 }
