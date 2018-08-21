@@ -22,22 +22,26 @@ class DataSet
 
     public function __construct(Pipe $ownerPipe, array $data)
     {
+        $this->pipe = $ownerPipe;
+        $this->data = $data;
     }
 
 
     private function ts() : int
     {
-
+        return (int)$this->data["ts"];
     }
 
     public function col(string $name)
     {
-
+        if ( ! isset ($this->data[$name]))
+            throw new \InvalidArgumentException("Column '$name' is undefined");
+        return $this->data[$name];
     }
 
     public function getInt(string $name)
     {
-
+        return (int)$this->col($name);
     }
 
     public function future(int $index=1)

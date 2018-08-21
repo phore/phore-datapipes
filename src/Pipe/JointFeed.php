@@ -9,7 +9,7 @@
 namespace Phore\DataPipes\Pipe;
 
 
-interface Joint
+interface JointFeed
 {
 
     public function first(DataSet $dataSet, Pipe $pipe_in);
