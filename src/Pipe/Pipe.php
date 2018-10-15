@@ -38,22 +38,21 @@ class Pipe
      */
     private $historyFifo;
 
+    /**
+     * @var PipeWork
+     */
+    private $pipeWork;
+
+    /**
+     * @var DataSet
+     */
+    private $lastDataSet;
+
 
     public function __construct()
     {
         $this->futureFifo = new FifoQueueFuture(0);
         $this->historyFifo = new FifoQueueHistory(1);
-
-        $this->futureFifo->setNext(function (DataSet $curDataSet) {
-            if ($this->joint !== null) {
-                if ($this->numDataSets === 1)
-                    $this->joint->first($curDataSet, $this);
-                $this->joint->message($curDataSet, $this);
-
-            }
-            $this->historyFifo->push($curDataSet);
-        });
-
     }
 
 
@@ -84,6 +83,11 @@ class Pipe
         ];
     }
 
+    public function last() : DataSet
+    {
+        return $this->lastDataSet;
+    }
+
     public function push($data)
     {
         if ($data instanceof DataSet)
@@ -91,13 +95,8 @@ class Pipe
         $this->curDataSet = $ds = new DataSet($this, $data);
         $this->numDataSets++;
         $this->futureFifo->push($ds);
+        $this->lastDataSet = $ds;
     }
-
-    public function connect(JointFeed $joint)
-    {
-        $this->joint = $joint;
-    }
-
 
     public function close()
     {
@@ -106,5 +105,6 @@ class Pipe
             $this->joint->close($this);
         $this->historyFifo->close();
     }
+
 
 }

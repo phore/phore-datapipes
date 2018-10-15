@@ -24,22 +24,11 @@ class FifoQueueHistory extends AbstractFifoQueue
     public function push($data)
     {
         array_unshift($this->buffer, $data);
-        if (count($this->buffer) > $this->length) {
-            $dataset = array_pop($this->buffer);
-            if ($this->next !== null) {
-                ($this->next)($dataset);
-            }
-        }
     }
 
-    public function close()
+    public function pull()
     {
-        while(count($this->buffer) > 0) {
-            $dataset = array_pop($this->buffer);
-            if ($this->next !== null) {
-                ($this->next)($dataset);
-            }
-        }
+        return array_pop($this->buffer);
     }
 
 }

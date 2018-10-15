@@ -11,20 +11,20 @@ namespace Phore\DataPipes\Queue;
 
 abstract class AbstractFifoQueue
 {
-    protected $length;
+    protected $minLenght;
 
     protected $buffer = [];
 
     protected $next = null;
 
-    public function __construct(int $length = 0)
+    public function __construct(int $minLenght = 0)
     {
-        $this->length = $length;
+        $this->minLenght = $minLenght;
     }
 
-    public function setLength(int $length)
+    public function setMinLength(int $minLength)
     {
-        $this->length = $length;
+        $this->minLenght = $minLength;
     }
 
     public function setNext(callable $fn)
@@ -32,10 +32,21 @@ abstract class AbstractFifoQueue
         $this->next = $fn;
     }
 
+    public function isEmpty() : bool
+    {
+        return count($this->buffer) === 0;
+    }
+
+    public function isValid() : bool
+    {
+        return count($this->buffer) >= $this->minLenght;
+    }
+
+
     abstract public function walk(callable $fn) : bool;
 
     abstract public function push($data);
 
-    abstract public function close();
+    abstract public function pull();
 
 }

@@ -13,37 +13,38 @@ use Phore\DataPipes\Pipe\DataSet;
 use Phore\DataPipes\Pipe\JointDrain;
 use Phore\DataPipes\Pipe\JointFeed;
 use Phore\DataPipes\Pipe\Pipe;
+use Phore\DataPipes\Pipe\PipeWork;
+use Phore\DataPipes\Pipe\PipeWorkClient;
 
-class CsvInputJointFeed implements JointDrain
+class CsvInputJointFeed implements JointDrain, PipeWorkClient
 {
 
-    private $pipe;
+    private $outPipe;
 
     private $colIndex2Name = null;
 
-    public function __construct()
+    private $filePointer = null;
+    private $delimiter = null;
+
+    private $pipework;
+
+    public function __construct(PipeWork $pipeWork)
     {
-        $this->pipe = new Pipe();
+        $this->pipework = $pipeWork;
+        $this->pipework->registerTick($this);
+
+        $this->outPipe = new Pipe($this->pipework);
     }
 
 
-    public function parse($url, $delimiter=",")
+
+    public function open($url, $delimiter=",")
     {
-        $fp = fopen($url, "r");
-        if ( ! $fp)
+        $this->filePointer = fopen($url, "r");
+        if ( ! $this->filePointer)
             throw new \InvalidArgumentException("Cannot open '$url' for reading.");
-
-        while ( ! feof($fp)) {
-            $data = fgetcsv($fp, 0, $delimiter);
-            if ($this->colIndex2Name === null) {
-                $this->parseHeader($data);
-            } else {
-                $this->pipe->push($this->transformToAssoc($data));
-            }
-        }
-        fclose($fp);
+        $this->delimiter = $delimiter;
     }
-
 
     private function transformToAssoc (array $inArray) : array
     {
@@ -58,12 +59,27 @@ class CsvInputJointFeed implements JointDrain
     {
         foreach ($data as $index => $name) {
             $this->colIndex2Name[$index] = $name;
-            $this->pipe->define($name);
+            $this->outPipe->define($name);
         }
     }
 
     public function getOutPipe(): Pipe
     {
-        return $this->pipe;
+        return $this->outPipe;
+    }
+
+    public function __on_tick(): bool
+    {
+        if (feof($this->filePointer))
+            return false;
+
+        $data = fgetcsv($this->filePointer, 0, $this->delimiter);
+
+        if ($this->colIndex2Name === null) {
+            $this->parseHeader($data);
+        } else {
+            $this->outPipe->push($this->transformToAssoc($data));
+        }
+        return true;
     }
 }

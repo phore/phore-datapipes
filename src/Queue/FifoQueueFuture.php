@@ -25,21 +25,15 @@ class FifoQueueFuture extends AbstractFifoQueue
     public function push($data)
     {
         array_push($this->buffer, $data);
-        if (count($this->buffer) > $this->length) {
-            $dataset = array_shift($this->buffer);
-            if ($this->next !== null) {
-                ($this->next)($dataset);
-            }
-        }
     }
 
-    public function close()
+    public function isEmpty () : bool
     {
-        while(count($this->buffer) > 0) {
-            $dataset = array_shift($this->buffer);
-            if ($this->next !== null) {
-                ($this->next)($dataset);
-            }
-        }
+        return count($this->buffer) === 0;
+    }
+
+    public function pull()
+    {
+        return array_shift($this->buffer);
     }
 }
