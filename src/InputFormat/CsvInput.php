@@ -76,7 +76,6 @@ class CsvInput
         if (count($input) === 1 && trim ($input[0]) === "")
             return true;
         $firstChar = substr($input[0], 0, 1);
-        echo $firstChar;
         if (in_array($firstChar, $this->commentChars))
             return true;
         return false;
