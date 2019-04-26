@@ -75,7 +75,7 @@ class DateTimeFileFinder
             $ret = ($a[0]->getTimestamp() < $b[0]->getTimestamp()) ? -1 : 1;
             if ($reverse === false)
                 return $ret;
-            return !$ret;
+            return (-1) * $ret;
         };
 
         usort($this->fileList, $cmpFn);
