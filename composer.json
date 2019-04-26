@@ -8,7 +8,8 @@
   "repositories": [
   ],
   "require": {
-    "php": ">=7.1"
+    "php": ">=7.2",
+    "phore/filesystem": "dev-master"
   },
   "autoload": {
     "psr-4": {
@@ -20,7 +21,7 @@
   },
   "minimum-stability": "dev",
   "require-dev": {
-    "nette/tester": "^2.1@dev"
+    "phpunit/phpunit": "*"
   }
 }
 
