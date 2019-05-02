@@ -66,6 +66,13 @@ class DateTimeFileFinder
     }
 
 
+    public function skipFileNameMatch(string $preg) : self
+    {
+        
+        return $this;
+    }
+
+
     public function sort($reverse=false) : self
     {
         $cmpFn = function ($a, $b) use ($reverse) {
