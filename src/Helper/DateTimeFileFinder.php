@@ -95,7 +95,7 @@ class DateTimeFileFinder
      *
      * <example>
      * $series->walk(
-     *      function(DateTime $dateTime, PhoreFile $file, int $index) {
+     *      function(DateFile $current, DateFile $previous=null, DateFile $next=null) {
      *          // do something
      *      }
      * );
@@ -106,7 +106,9 @@ class DateTimeFileFinder
     public function walk (callable $fn)
     {
         foreach ($this->fileList as $index => $cur) {
-            $fn($cur[0], $cur[1], $index);
+            $previous = isset($this->fileList[$index-1]) ? new DateFile($this->fileList[$index-1][0], $this->fileList[$index-1][1], $index-1) : null; 
+            $next = isset($this->fileList[$index+1]) ? new DateFile($this->fileList[$index+1][0], $this->fileList[$index+1][1], $index+1) : null;
+            $fn(new DateFile($cur[0], $cur[1], $index), $previous, $next);
         }
     }
 
