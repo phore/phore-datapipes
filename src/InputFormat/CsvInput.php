@@ -96,6 +96,9 @@ class CsvInput
             if ($this->input->feof())
                 throw new \InvalidArgumentException("No header found in csv stream.");
             $cols = $this->input->freadcsv(0, $this->delimiter);
+            if ($cols === null) {
+                $cols = [];
+            }
             if ($this->isCommentLine($cols))
                 continue;
             break;
