@@ -82,6 +82,18 @@ class CsvInput
     }
 
 
+    public function readPlainText(int $lines) : string
+    {
+        $buf = "";
+        for ($i=0; $i<$lines; $i++) {
+            if ($this->input->feof())
+                throw new \InvalidArgumentException("Premature end of input file while reading plain text ($lines lines)");
+            $buf .= $this->input->fread();
+        }
+        return $buf;
+    }
+
+
     /**
      * Read the first line and treat it as header (assoc)
      *
