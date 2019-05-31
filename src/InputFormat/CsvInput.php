@@ -88,7 +88,7 @@ class CsvInput
         for ($i=0; $i<$lines; $i++) {
             if ($this->input->feof())
                 throw new \InvalidArgumentException("Premature end of input file while reading plain text ($lines lines)");
-            $buf .= $this->input->fread();
+            $buf .= $this->input->fgets();
         }
         return $buf;
     }
