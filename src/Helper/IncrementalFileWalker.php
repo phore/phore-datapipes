@@ -11,6 +11,7 @@ namespace Phore\DataPipes\Helper;
 
 use Phore\FileSystem\PhoreDirectory;
 use Phore\FileSystem\PhoreFile;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 class IncrementalFileWalker
@@ -49,6 +50,11 @@ class IncrementalFileWalker
             throw new \InvalidArgumentException("Invalid regular expression: '$filterPreg'");
     }
 
+    public function setLogger(LoggerInterface $logger) : self
+    {
+        $this->logger = $logger;
+        return $this;
+    }
 
 
 
@@ -74,19 +80,26 @@ class IncrementalFileWalker
     {
         foreach ($this->dataDir->genWalk() as $file) {
             $filename = $file->getFilename();
-            if ($this->filterPreg !== null &&  ! preg_match($this->filterPreg, $filename))
-                continue;
-
-            if ($this->logDir->withSubPath($filename . ".OK")->isFile()) {
+            if ($this->filterPreg !== null &&  ! preg_match($this->filterPreg, $filename)) {
+                $this->logger->debug("Filename $filename doesn't match '$this->filterPreg' - skip file");
                 continue;
             }
 
-            if ($mode === self::WALK_NEW && $this->logDir->withSubPath($filename . ".ERR")->isFile())
+            if ($this->logDir->withSubPath($filename . ".OK")->isFile()) {
+                $this->logger->debug("Filename $filename : OK file existing - skip");
                 continue;
+            }
 
-            if ($mode === self::WALK_ERR && ! $this->logDir->withSubPath($filename . ".ERR")->isFile())
+            if ($mode === self::WALK_NEW && $this->logDir->withSubPath($filename . ".ERR")->isFile()) {
+                $this->logger->debug("Mode: walkNew - filename $filename : error file existing - skip");
                 continue;
+            }
 
+            if ($mode === self::WALK_ERR && ! $this->logDir->withSubPath($filename . ".ERR")->isFile()) {
+                $this->logger->debug("Mode: walkErr - filename $filename : error file not existing - skip");
+                continue;
+            }
+            $this->logger->debug("Processing $filename ...");
             $this->runSingleFile($file, $cb);
 
         }
