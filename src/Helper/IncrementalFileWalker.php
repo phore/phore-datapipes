@@ -72,7 +72,7 @@ class IncrementalFileWalker
             $this->logger->info("Success on $file: " . phore_json_encode($result));
         } catch (\Exception $e) {
             $errFile->set_contents("ERROR: " . $e->getMessage() . "\n\n" . $e->getTraceAsString());
-            $this->logger->emergency("Failed: $file: " . $e->getMessage());
+            $this->logger->error("Failed: $file: " . $e->getMessage());
         }
     }
 
