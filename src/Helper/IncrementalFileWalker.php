@@ -61,8 +61,8 @@ class IncrementalFileWalker
 
     protected function runSingleFile (PhoreFile $file, callable $cb)
     {
-        $errFile = $this->logDir->withSubPath($file->getFilename() . ".ERR")->asFile();
-        $okFile = $this->logDir->withSubPath($file->getFilename() . ".OK")->asFile();
+        $errFile = $this->logDir->withSubPath($file->getBasename() . ".ERR")->asFile();
+        $okFile = $this->logDir->withSubPath($file->getBasename() . ".OK")->asFile();
 
         try {
             $result = $cb($file);
@@ -79,7 +79,11 @@ class IncrementalFileWalker
     public function walk(callable $cb, string $mode = self::WALK_NEW)
     {
         foreach ($this->dataDir->genWalk() as $file) {
-            $filename = $file->getFilename();
+            if ( ! $file->isFile())
+                continue;
+            
+            $this->logger->debug("Walking $file...");
+            $filename = $file->getBasename();
             if ($this->filterPreg !== null &&  ! preg_match($this->filterPreg, $filename)) {
                 $this->logger->debug("Filename $filename doesn't match '$this->filterPreg' - skip file");
                 continue;
