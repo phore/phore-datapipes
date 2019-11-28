@@ -16,6 +16,11 @@ use Psr\Log\NullLogger;
 class IncrementalFileWalker
 {
 
+
+    const WALK_NEW = "new";
+    const WALK_ERR = "err";
+
+
     private $dataDir;
     private $logDir;
 
@@ -65,7 +70,7 @@ class IncrementalFileWalker
         }
     }
 
-    public function walk(callable $cb)
+    public function walk(callable $cb, string $mode = self::WALK_NEW)
     {
         foreach ($this->dataDir->genWalk() as $file) {
             $filename = $file->getFilename();
@@ -75,6 +80,12 @@ class IncrementalFileWalker
             if ($this->logDir->withSubPath($filename . ".OK")->isFile()) {
                 continue;
             }
+
+            if ($mode === self::WALK_NEW && $this->logDir->withSubPath($filename . ".ERR")->isFile())
+                continue;
+
+            if ($mode === self::WALK_ERR && ! $this->logDir->withSubPath($filename . ".ERR")->isFile())
+                continue;
 
             $this->runSingleFile($file, $cb);
 
