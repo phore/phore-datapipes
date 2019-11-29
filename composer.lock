@@ -63,12 +63,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phore/phore-filesystem.git",
-                "reference": "c13329d04e213dc2bc2a596f6ae22bd7754b5f6c"
+                "reference": "9bbf9dea41536ed5cd6091c5bb925829f45c2cfa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phore/phore-filesystem/zipball/c13329d04e213dc2bc2a596f6ae22bd7754b5f6c",
-                "reference": "c13329d04e213dc2bc2a596f6ae22bd7754b5f6c",
+                "url": "https://api.github.com/repos/phore/phore-filesystem/zipball/9bbf9dea41536ed5cd6091c5bb925829f45c2cfa",
+                "reference": "9bbf9dea41536ed5cd6091c5bb925829f45c2cfa",
                 "shasum": ""
             },
             "require": {
@@ -102,7 +102,7 @@
             ],
             "description": "Acces files layer",
             "homepage": "http://infracamp.org/project/phore",
-            "time": "2019-11-26T18:08:00+00:00"
+            "time": "2019-11-28T12:07:25+00:00"
         },
         {
             "name": "psr/http-message",

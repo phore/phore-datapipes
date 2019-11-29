@@ -28,7 +28,7 @@ class IncrementalFileWalkerTest extends TestCase
         $logDir = phore_dir("/tmp/LOG")->rmDir(true);
 
         $walker = new IncrementalFileWalker(phore_dir("/tmp/IN"), $logDir);
-
+        $walker->setFileFilterPreg("/^t/");
         $proc = 0;
         $walker->walk(function(PhoreFile $inFile) use (&$proc) {
             $proc++;

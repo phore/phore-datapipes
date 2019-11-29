@@ -63,10 +63,10 @@ class IncrementalFileWalker
             if ($errFile->exists())
                 $errFile->unlink();
             $okFile->set_contents(phore_json_encode($result));
-            $this->logger->info("Success on $file: " . phore_json_encode($result));
+            $this->logger->debug("Success on $file: " . phore_json_encode($result));
         } catch (\Exception $e) {
             $errFile->set_contents("ERROR: " . $e->getMessage() . "\n\n" . $e->getTraceAsString());
-            $this->logger->emergency("Failed: $file: " . $e->getMessage());
+            $this->logger->warning("Failed: $file: " . $e->getMessage());
         }
     }
 
@@ -91,8 +91,5 @@ class IncrementalFileWalker
 
         }
     }
-
-
-
 
 }
