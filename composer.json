@@ -9,7 +9,7 @@
   ],
   "require": {
     "php": ">=7.2",
-    "phore/filesystem": "dev-master",
+    "phore/filesystem": "*",
     "psr/log": "^1.1@dev"
   },
   "autoload": {
