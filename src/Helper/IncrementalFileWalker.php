@@ -108,29 +108,29 @@ class IncrementalFileWalker
             }
             $this->logger->debug("Processing $filename ...");
             $this->runSingleFile($file, $cb);
-
         }
     }
 
-    protected function runSingleCheckFile (PhoreFile $file, callable $cb)
+    protected function runSingleCheckFile (PhoreFile $checkFile, callable $cb)
     {
-        $inFile = $this->dataDir->withSubPath($file->getBasename())->asFile();
-        $okFile = $this->logDir->withSubPath($file->getBasename() . ".OK")->asFile();
-        $checkFile = $this->logDir->withSubPath($file->getBasename() . ".CHECK")->asFile();
+        $inFile = $this->dataDir->withSubPath($checkFile->getFilename())->asFile();
+        $okFile = $this->logDir->withSubPath($checkFile->getFilename() . ".OK")->asFile();
+//        $checkFile = $this->logDir->withSubPath($file->getFilename() . ".CHECK")->asFile();
 
         try {
-            $result = $cb($file, $inFile);
+            $result = $cb($checkFile, $inFile);
             if($result === true) {
                 $checkFile->unlink();
-                $okFile->set_contents("FS checked:".$file->fileSize());
-                $this->logger->debug("Success on filesize check: $file(". $file->fileSize().")" );
+                $okFile->set_contents("FS checked:".$inFile->fileSize());
+                $this->logger->debug("Success on filesize check: $inFile(". $inFile->fileSize().")" );
             } else {
                 $checkFile->unlink();
                 $okFile->unlink();
+                $this->logger->debug("Failed on filesize check: $inFile(". $inFile->fileSize().")" );
             }
         } catch (\Exception $e) {
             $okFile->unlink();
-            $this->logger->warning("Failed: $file: " . $e->getMessage());
+            $this->logger->warning("Failed: $checkFile: " . $e->getMessage());
         }
     }
 
@@ -150,5 +150,4 @@ class IncrementalFileWalker
             $this->runSingleCheckFile($file, $cb);
         }
     }
-
 }
