@@ -56,19 +56,17 @@ class IncrementalFileWalker
         return $this;
     }
 
-
-
-
     protected function runSingleFile (PhoreFile $file, callable $cb)
     {
         $errFile = $this->logDir->withSubPath($file->getBasename() . ".ERR")->asFile();
-        $okFile = $this->logDir->withSubPath($file->getBasename() . ".OK")->asFile();
+//        $okFile = $this->logDir->withSubPath($file->getBasename() . ".OK")->asFile();
+        $checkFile = $this->logDir->withSubPath($file->getBasename() . ".CHECK")->asFile();
 
         try {
             $result = $cb($file);
             if ($errFile->exists())
                 $errFile->unlink();
-            $okFile->set_contents(phore_json_encode($result));
+            $checkFile->set_contents($file->fileSize());
             $this->logger->debug("Success on $file: " . phore_json_encode($result));
         } catch (\Exception $e) {
             $errFile->set_contents("ERROR: " . $e->getMessage() . "\n\n" . $e->getTraceAsString());
@@ -81,7 +79,7 @@ class IncrementalFileWalker
         foreach ($this->dataDir->genWalk() as $file) {
             if ( ! $file->isFile())
                 continue;
-            
+
             $this->logger->debug("Walking $file...");
             $filename = $file->getBasename();
             if ($this->filterPreg !== null &&  ! preg_match($this->filterPreg, $filename)) {
@@ -91,6 +89,11 @@ class IncrementalFileWalker
 
             if ($this->logDir->withSubPath($filename . ".OK")->isFile()) {
                 $this->logger->debug("Filename $filename : OK file existing - skip");
+                continue;
+            }
+
+            if ($this->logDir->withSubPath($filename . ".CHECK")->isFile()) {
+                $this->logger->debug("Filename $filename : CHECK file existing - skip");
                 continue;
             }
 
@@ -106,6 +109,45 @@ class IncrementalFileWalker
             $this->logger->debug("Processing $filename ...");
             $this->runSingleFile($file, $cb);
 
+        }
+    }
+
+    protected function runSingleCheckFile (PhoreFile $file, callable $cb)
+    {
+        $inFile = $this->dataDir->withSubPath($file->getBasename())->asFile();
+        $okFile = $this->logDir->withSubPath($file->getBasename() . ".OK")->asFile();
+        $checkFile = $this->logDir->withSubPath($file->getBasename() . ".CHECK")->asFile();
+
+        try {
+            $result = $cb($file, $inFile);
+            if($result === true) {
+                $checkFile->unlink();
+                $okFile->set_contents("FS checked:".$file->fileSize());
+                $this->logger->debug("Success on filesize check: $file(". $file->fileSize().")" );
+            } else {
+                $checkFile->unlink();
+                $okFile->unlink();
+            }
+        } catch (\Exception $e) {
+            $okFile->unlink();
+            $this->logger->warning("Failed: $file: " . $e->getMessage());
+        }
+    }
+
+    public function walkCheck(callable $cb)
+    {
+        foreach ($this->logDir->genWalk() as $file) {
+            if (!$file->isFile())
+                continue;
+
+            $this->logger->debug("Walking $file...");
+            $filename = $file->getBasename();
+            if ($this->filterPreg !== null && !preg_match($this->filterPreg, $filename)) {
+                $this->logger->debug("Filename $filename doesn't match '$this->filterPreg' - skip file");
+                continue;
+            }
+            $this->logger->debug("Processing $filename ...");
+            $this->runSingleCheckFile($file, $cb);
         }
     }
 
