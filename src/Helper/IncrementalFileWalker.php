@@ -123,17 +123,21 @@ class IncrementalFileWalker
             $this->logger->notice("nach Callback");
 
             if($result === true) {
-                $checkFile->unlink();
+                if($checkFile->exists())
+                    $checkFile->unlink();
                 $okFile->set_contents("FS checked:".$inFile->fileSize());
                 $this->logger->debug("Success on filesize check: $inFile(". $inFile->fileSize().")" );
             } else {
-                $checkFile->unlink();
-                $okFile->unlink();
+                if($checkFile->exists())
+                    $checkFile->unlink();
+                if($okFile->exists())
+                    $okFile->unlink();
                 $this->logger->debug("Failed on filesize check: $inFile(". $inFile->fileSize().")" );
             }
         } catch (\Exception $e) {
             $this->logger->notice("im Catch");
-            $okFile->unlink();
+            if($okFile->exists())
+                $okFile->unlink();
             $this->logger->warning("Failed: $checkFile: " . $e->getMessage());
         }
     }
