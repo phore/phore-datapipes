@@ -28,7 +28,7 @@ class IncrementalFileWalker
     private $filterPreg = null;
 
     /**
-     * @var NullLogger
+     * @var NullLogger $logger
      */
     private $logger;
 
@@ -118,7 +118,10 @@ class IncrementalFileWalker
 //        $checkFile = $this->logDir->withSubPath($file->getFilename() . ".CHECK")->asFile();
 
         try {
+            $this->logger->notice("vor Callback");
             $result = $cb($checkFile, $inFile);
+            $this->logger->notice("nach Callback");
+
             if($result === true) {
                 $checkFile->unlink();
                 $okFile->set_contents("FS checked:".$inFile->fileSize());
@@ -129,6 +132,7 @@ class IncrementalFileWalker
                 $this->logger->debug("Failed on filesize check: $inFile(". $inFile->fileSize().")" );
             }
         } catch (\Exception $e) {
+            $this->logger->notice("im Catch");
             $okFile->unlink();
             $this->logger->warning("Failed: $checkFile: " . $e->getMessage());
         }
