@@ -118,9 +118,9 @@ class IncrementalFileWalker
 //        $checkFile = $this->logDir->withSubPath($file->getFilename() . ".CHECK")->asFile();
 
         try {
-            $this->logger->notice("vor Callback");
+            $this->logger->debug("vor Callback");
             $result = $cb($checkFile, $inFile);
-            $this->logger->notice("nach Callback");
+            $this->logger->debug("nach Callback");
 
             if($result === true) {
                 if($checkFile->exists())
@@ -135,7 +135,7 @@ class IncrementalFileWalker
                 $this->logger->debug("Failed on filesize check: $inFile(". $inFile->fileSize().")" );
             }
         } catch (\Exception $e) {
-            $this->logger->notice("im Catch");
+            $this->logger->debug("im Catch");
             if($okFile->exists())
                 $okFile->unlink();
             $this->logger->warning("Failed: $checkFile: " . $e->getMessage());
