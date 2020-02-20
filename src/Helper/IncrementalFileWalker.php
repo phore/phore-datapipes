@@ -138,7 +138,7 @@ class IncrementalFileWalker
             $this->logger->debug("im Catch");
             if($okFile->exists())
                 $okFile->unlink();
-            $this->logger->warning("Failed: $checkFile: " . $e->getMessage());
+            $this->logger->debug("Failed: $checkFile: " . $e->getMessage());
         }
     }
 
